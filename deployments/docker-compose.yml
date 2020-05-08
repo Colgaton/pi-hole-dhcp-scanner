@@ -1,0 +1,14 @@
+version: "2"
+services:
+  app:
+    container_name: pi-hole-scanner
+    build:
+      context: ../
+      dockerfile: deployments/app/Dockerfile
+    volumes:
+      - ./app:/app
+    environment:
+      LISTENONLY: 1
+    ports:
+      - "5001:5001"
+      
