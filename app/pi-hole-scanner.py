@@ -35,7 +35,7 @@ else:
 def run_nmap(iptoscan):
     nmapcmd = '/usr/bin/nmap' 
     print ("Running nmap...")
-    result = subprocess.run([nmapcmd, iptoscan, "-oN", "testoutput", "-p", "80"], stdout=subprocess.PIPE)
+    result = subprocess.run([nmapcmd, iptoscan, "-p", "80"], stdout=subprocess.PIPE)
     return (result.stdout.decode('utf-8'))
 
 def create_connection(db_file):
@@ -125,9 +125,9 @@ def ipscan():
 
     conn.close()
 
-    nmapoutput = run_nmap(iptoscan)
-
-    send_results(nmapoutput)
+    if listenonly == 0:
+        nmapoutput = run_nmap(iptoscan)
+        send_results(nmapoutput)
 
     return '''<h1>done</h1>'''
 

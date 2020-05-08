@@ -9,6 +9,7 @@ services:
       - ./app:/app
     environment:
       LISTENONLY: 1
+      PUSHBULLETKEY: 'abc'
     ports:
       - "5001:5001"
       
