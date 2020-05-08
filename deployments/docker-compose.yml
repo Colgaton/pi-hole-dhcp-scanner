@@ -5,6 +5,7 @@ services:
     build:
       context: ../
       dockerfile: deployments/app/Dockerfile
+    image: pi-hole-scanner
     volumes:
       - ./app:/app
     environment:

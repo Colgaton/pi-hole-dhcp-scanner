@@ -6,9 +6,11 @@ import subprocess
 from pushbullet import Pushbullet
 import os
 import sys
+from datetime import datetime
 
 app = Flask(__name__) #create the Flask app
 
+now = ''
 e = ''
 database = r"sqlite.db"
 sql_create_ip_table = """CREATE TABLE IF NOT EXISTS ips (
@@ -20,21 +22,21 @@ sql_create_ip_table = """CREATE TABLE IF NOT EXISTS ips (
                                         addedin text NOT NULL
                                     ); """
 if "PUSHBULLETKEY" not in os.environ:
-    print ("Missing Pushbullet Key...")
+    print ("Missing Pushbullet Key...", file=sys.stderr)
     sys.exit(2)
 
 pushbulletkey = os.environ['PUSHBULLETKEY']
 
 if "LISTENONLY" in os.environ:
     listenonly = os.environ['LISTENONLY']
-    print("Starting in listenonly mode...")
+    print("Starting in listenonly mode...", file=sys.stderr)
 else:
-    print("Starting in scanning mode...")
+    print("Starting in scanning mode...", file=sys.stderr)
     listenonly = 0
 
 def run_nmap(iptoscan):
     nmapcmd = '/usr/bin/nmap' 
-    print ("Running nmap...")
+    print ("Running nmap...", file=sys.stderr)
     result = subprocess.run([nmapcmd, iptoscan, "-p", "80"], stdout=subprocess.PIPE)
     return (result.stdout.decode('utf-8'))
 
@@ -44,7 +46,7 @@ def create_connection(db_file):
         conn = sqlite3.connect(db_file)
         return conn
     except Error as e:
-        print (e)
+        print (e, file=sys.stderr)
 
 def check_if_table_exists(conn, database):
     c = conn.cursor()
@@ -60,7 +62,7 @@ def create_table(conn, create_table_sql):
         c = conn.cursor()
         c.execute(create_table_sql)
     except Error as e:
-        print(e)
+        print(e, file=sys.stderr)
 
 def insert_record(conn, record):
     sql = """ INSERT INTO ips(name, ip, macaddr, lastchecked, addedin) VALUES (?,?,?,?,?) """
@@ -69,7 +71,7 @@ def insert_record(conn, record):
         c.execute(sql,record)
         conn.commit()
     except Error as e:
-        print("Error: %s", e)
+        print(e, file=sys.stderr)
         return '<P>Error</P>'
 
     return c.lastrowid
@@ -79,7 +81,7 @@ def select_record(conn, macaddr):
         c = conn.cursor()
         c.execute("SELECT * FROM ips WHERE macaddr=?", (macaddr,))
     except Error as e:
-        print("Error select_record: %s", e)
+        print("Error select_record:", e, file=sys.stderr)
         return '<P>select record error</P>'
 
     return (len(c.fetchall()))
@@ -107,7 +109,7 @@ def ipscan():
     conn = create_connection(database)
 
     if conn is None:
-        print ("Erro creating conn")
+        print ("Erro creating conn", file=sys.stderr)
         return '''<h1>Error creating sqlite</h1>'''
 
     # Check if table does not exist, and creates it
@@ -117,8 +119,9 @@ def ipscan():
     rows = select_record(conn, macaddr)
 
     if rows == 0:
-        print("Rows == 0, inserting rows")
-        record = ('router',iptoscan,macaddr,'5/4/2020','5/4/2020')
+        print("Rows == 0, inserting rows", file=sys.stderr)
+        addedin = datetime.now().timestamp()
+        record = ('router',iptoscan,macaddr,'5/4/2020',addedin)
         insert_record(conn, record)
     else:
         print("Mac Address already exists. Number of rows:", rows)
@@ -132,4 +135,4 @@ def ipscan():
     return '''<h1>done</h1>'''
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001) #run app in debug mode on port 5001
+    app.run(debug=True,host='127.0.0.1', port=5001) #run app in debug mode on port 5001
