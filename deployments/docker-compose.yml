@@ -11,6 +11,9 @@ services:
     environment:
       LISTENONLY: 1
       PUSHBULLETKEY: 'abc'
+      LISTENHOST: '127.0.0.1'
+      GOTIFYURL: ''
+      GOTIFYKEY: ''
     ports:
       - "5001:5001"
       

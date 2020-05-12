@@ -28,6 +28,7 @@ if "NOTIFICATIONMODE" not in os.environ:
     sys.exit(2)
 
 notificationmode = os.environ['NOTIFICATIONMODE']
+listenhost = os.environ['LISTENHOST']
 
 if notificationmode == 'p':
     if not "PUSHBULLETKEY" in os.environ:
@@ -146,16 +147,14 @@ def ipscan():
         addedin = datetime.now().timestamp()
         record = ('router',iptoscan,macaddr,'5/4/2020',addedin)
         insert_record(conn, record)
+        if listenonly == 0:
+            nmapoutput = run_nmap(iptoscan)
+            send_results(nmapoutput)
     else:
         print("Mac Address already exists. Number of rows:", rows)
 
     conn.close()
-
-    if listenonly == 0:
-        nmapoutput = run_nmap(iptoscan)
-        send_results(nmapoutput)
-
     return '''<h1>done</h1>'''
 
 if __name__ == '__main__':
-    app.run(debug=True,host='127.0.0.1', port=5001) #run app in debug mode on port 5001
+    app.run(debug=True,host=listenhost, port=5001) #run app in debug mode on port 5001
