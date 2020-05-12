@@ -7,6 +7,7 @@ from pushbullet import Pushbullet
 import os
 import sys
 from datetime import datetime
+import requests # for gotify
 
 app = Flask(__name__) #create the Flask app
 
@@ -21,11 +22,28 @@ sql_create_ip_table = """CREATE TABLE IF NOT EXISTS ips (
                                         lastchecked text NOT NULL,
                                         addedin text NOT NULL
                                     ); """
-if "PUSHBULLETKEY" not in os.environ:
-    print ("Missing Pushbullet Key...", file=sys.stderr)
+
+if "NOTIFICATIONMODE" not in os.environ:
+    print ("You have to provide the NOTIFICATIONMODE env var...", file=sys.stderr)
     sys.exit(2)
 
-pushbulletkey = os.environ['PUSHBULLETKEY']
+notificationmode = os.environ['NOTIFICATIONMODE']
+
+if notificationmode == 'p':
+    if not "PUSHBULLETKEY" in os.environ:
+        print ("Missing PUSHBULLETKEY...", file=sys.stderr)
+        sys.exit(2)
+    else:
+         pushbulletkey = os.environ['PUSHBULLETKEY']
+         print ("Pushbullet enabled...", file=sys.stderr)
+elif notificationmode == 'g':
+    if not "GOTIFYKEY" or not "GOTIFYURL" in os.environ:
+        print ("Missing gotify vars...", file=sys.stderr)
+        sys.exit(2)
+    else:
+        gotifykey = os.environ['GOTIFYKEY']
+        gotifyurl = os.environ['GOTIFYURL']
+        print ("Gotify enabled...", file=sys.stderr)
 
 if "LISTENONLY" in os.environ:
     listenonly = os.environ['LISTENONLY']
@@ -88,8 +106,13 @@ def select_record(conn, macaddr):
 
 def send_results(note):
 
-    pb = Pushbullet(pushbulletkey)
-    push = pb.push_note("New device detected!", note)
+    if notificationmode == 'p':
+        pb = Pushbullet(pushbulletkey)
+        push = pb.push_note("New device detected!", note)
+    elif notificationmode == 'g':
+        url = ("%s/message?token=%s" % (gotifyurl, gotifykey))
+        message = {'title': 'New device detected!', 'message': note }
+        rest = requests.post(url, json=message)
 
 @app.route('/scan')
 def ipscan():
