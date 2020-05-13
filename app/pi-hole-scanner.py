@@ -141,17 +141,15 @@ def ipscan():
         create_table(conn, sql_create_ip_table)
 
     rows = select_record(conn, macaddr)
-
-    if rows == 0:
-        print("Rows == 0, inserting rows", file=sys.stderr)
-        addedin = datetime.now().timestamp()
-        record = ('router',iptoscan,macaddr,'5/4/2020',addedin)
-        insert_record(conn, record)
-        if listenonly == 0:
-            nmapoutput = run_nmap(iptoscan)
-            send_results(nmapoutput)
+    if rows == 0 and  listenonly == 0:
+        nmapoutput = run_nmap(iptoscan)
+        send_results(nmapoutput)
     else:
-        print("Mac Address already exists. Number of rows:", rows)
+        print("Mac Address already exists. Number of rows and mac: ", rows, macaddr)
+
+    addedin = datetime.now().timestamp()
+    record = ('router',iptoscan,macaddr,'5/4/2020',addedin)
+    insert_record(conn, record)
 
     conn.close()
     return '''<h1>done</h1>'''
