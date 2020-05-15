@@ -175,9 +175,10 @@ def ipscan():
     rows = select_record(conn, macaddr)
 
     # First time we see this device, so run a scan and send results
-    if len(rows) == 0 and  listenonly == 0:
-        nmapoutput = run_nmap(iptoscan)
-        send_results("New device detected!", nmapoutput)
+    if len(rows) == 0:
+        if listenonly == 0:
+            nmapoutput = run_nmap(iptoscan)
+            send_results("New device detected!", nmapoutput)
         addedin = datetime.now().timestamp()
         record = ('router',iptoscan,macaddr,'5/4/2020',addedin)
         insert_record(conn, record)
@@ -187,8 +188,9 @@ def ipscan():
                  ips_are_equal = 1 # IP is in the db already, quit
                  break
          if ips_are_equal == 0: # if IP is not in the database, did the device got a new IP?
-             print("Did the device change its ip?", file=sys.stderr)
-             send_results("Device with new IP detected!", macaddr)
+             if listenonly == 0:
+                 print("Did the device change its ip?", file=sys.stderr)
+                 send_results("Device with new IP detected!", macaddr)
              addedin = datetime.now().timestamp()
              record = ('router',iptoscan,macaddr,'5/4/2020',addedin)
              insert_record(conn, record)
