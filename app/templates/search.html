@@ -1,0 +1,47 @@
+<!DOCTYPE html> 
+  
+<html> 
+<head> 
+    <title>For loop in Flask</title> 
+</head> 
+<script>
+function appendLeadingZeroes(n){
+  if(n <= 9){
+    return "0" + n;
+  }
+  return n
+}
+
+function ddate(p1) {
+
+var d = new Date(p1 * 1000)
+return d.getFullYear() + "-" + appendLeadingZeroes(d.getMonth() + 1) + "-" + appendLeadingZeroes(d.getDate()) + " " + appendLeadingZeroes(d.getHours()) + ":" + appendLeadingZeroes(d.getMinutes()) + ":" + appendLeadingZeroes(d.getSeconds())
+
+//return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() 
+
+}
+</script>
+
+<body> 
+  
+<table border=1>
+    <thead>
+    <tr>
+        <th>IP</th>
+        <th>MAC Address</th>
+        <th>Timestamp</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for row in value %} 
+            <tr>
+                <td>{{row[2]}}</td>
+                <td>{{row[3]}}</td>
+                <td><script>document.write(ddate({{row[5]}}));</script></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+  
+</body> 
+</html>

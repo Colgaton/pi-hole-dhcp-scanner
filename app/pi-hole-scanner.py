@@ -48,7 +48,7 @@ elif notificationmode == 'g':
         print ("Gotify enabled...", file=sys.stderr)
 
 if "LISTENONLY" in os.environ:
-    listenonly = os.environ['LISTENONLY']
+    listenonly = 1
     print("Starting in listenonly mode...", file=sys.stderr)
 else:
     print("Starting in scanning mode...", file=sys.stderr)
