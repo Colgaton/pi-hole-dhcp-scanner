@@ -31,6 +31,12 @@ if "NOTIFICATIONMODE" not in os.environ:
 notificationmode = os.environ['NOTIFICATIONMODE']
 listenhost = os.environ['LISTENHOST']
 
+if "NMAPOPT" in os.environ:
+    nmapopt = os.environ['NMAPOPT']
+else:
+    nmapopt = '-A -T4'
+
+
 if notificationmode == 'p':
     if not "PUSHBULLETKEY" in os.environ:
         print ("Missing PUSHBULLETKEY...", file=sys.stderr)
@@ -57,7 +63,7 @@ else:
 def run_nmap(iptoscan):
     nmapcmd = '/usr/bin/nmap' 
     print ("Running nmap...", file=sys.stderr)
-    result = subprocess.run([nmapcmd, iptoscan, "-p", "80"], stdout=subprocess.PIPE)
+    result = subprocess.run([nmapcmd, iptoscan, nmapopt], stdout=subprocess.PIPE)
     return (result.stdout.decode('utf-8'))
 
 def create_connection(db_file):

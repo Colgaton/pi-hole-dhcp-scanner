@@ -15,6 +15,7 @@ services:
       GOTIFYURL: ''
       GOTIFYKEY: ''
       NOTIFICATIONMODE: 'p'
+      NMAPOPT: '-A -T4'
     ports:
       - "5001:5001"
       
