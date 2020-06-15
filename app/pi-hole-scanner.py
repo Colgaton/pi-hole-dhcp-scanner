@@ -122,6 +122,21 @@ def send_results(title,note):
         message = {'title': title, 'message': note }
         rest = requests.post(url, json=message)
 
+@app.route('/testnotify')
+def testnotify():
+    send_results('Test', 'This is a test')
+
+    #for var in os.environ:
+    #   print(var,file=sys.stderr)
+    if 'LISTENONLIY' in os.environ: print ('LISTENONLY: ', os.environ['LISTENONLY'], file=sys.stderr)
+    if 'LISTENHOST' in os.environ: print ('LISTENHOST: ', os.environ['LISTENHOST'], file=sys.stderr)
+    if 'GOTIFYURL' in os.environ: print ('GOTIFYURL: ', os.environ['GOTIFYURL'], file=sys.stderr)
+    if 'NOTIFICATIONMODE' in os.environ: print ('NOTIFICATIONMODE: ', os.environ['NOTIFICATIONMODE'], file=sys.stderr)
+    if 'NMAPOPT' in os.environ: print ('NMAPOPT: ', os.environ['NMAPOPT'], file=sys.stderr)
+
+    return "<h1>Check the console logs</h1>"
+
+
 @app.route('/search')
 def search():
     macaddr = request.args.get('mac')
@@ -139,7 +154,6 @@ def search():
 
     try:
         c = conn.cursor()
-        #rows = c.execute("SELECT * FROM ips WHERE macaddr=?", (macaddr,))
         c.execute("SELECT * FROM ips WHERE macaddr=?", (macaddr,))
     except Error as e:
         print("Error select_record:", e, file=sys.stderr)
